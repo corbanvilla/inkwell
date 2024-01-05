@@ -257,11 +257,6 @@ pub struct PassManager<T> {
 }
 
 impl PassManager<FunctionValue<'_>> {
-    /// Acquires the underlying raw pointer belonging to this `PassManager<T>` type.
-    pub fn as_mut_ptr(&self) -> LLVMPassManagerRef {
-        self.pass_manager
-    }
-
     // return true means some pass modified the module, not an error occurred
     pub fn initialize(&self) -> bool {
         unsafe { LLVMInitializeFunctionPassManager(self.pass_manager) == 1 }
@@ -292,6 +287,11 @@ impl<T: PassManagerSubType> PassManager<T> {
     /// and false otherwise.
     pub fn run_on(&self, input: &T) -> bool {
         unsafe { input.run_in_pass_manager(self) }
+    }
+
+    /// Acquires the underlying raw pointer belonging to this `PassManager<T>` type.
+    pub fn as_mut_ptr(&self) -> LLVMPassManagerRef {
+        self.pass_manager
     }
 
     /// This pass promotes "by reference" arguments to be "by value" arguments.
